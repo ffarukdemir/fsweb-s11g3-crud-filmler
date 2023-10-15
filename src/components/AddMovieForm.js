@@ -1,13 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useHistory } from "react-router-dom";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 import axios from "axios";
 
-const EditMovieForm = (props) => {
-  const history = useHistory(); // useHistory'i kullanarak tarih nesnesini alın
-  const { setMovies } = props;
-  const { id } = useParams();
-
+const AddMovieForm = (props) => {
   const [movie, setMovie] = useState({
     title: "",
     director: "",
@@ -15,17 +9,6 @@ const EditMovieForm = (props) => {
     metascore: 0,
     description: "",
   });
-
-  useEffect(() => {
-    axios
-      .get(`http://localhost:9000/api/movies/${id}`)
-      .then((res) => {
-        setMovie(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [id]);
 
   const handleChange = (e) => {
     setMovie({
@@ -37,31 +20,37 @@ const EditMovieForm = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .put(`http://localhost:9000/api/movies/${id}`, movie)
+      .post("http://localhost:9000/api/movies", movie)
       .then((res) => {
-        setMovies(res.data); // Güncellenmiş film listesini global state'e kaydet
-        history.push(`/movies/${id}`); // Kullanıcıyı düzenlenen filmin sayfasına yönlendir
+        props.setMovies(res.data);
+        // Yeni film eklemesi başarılı olduğunda formu temizleyin
+        setMovie({
+          title: "",
+          director: "",
+          genre: "",
+          metascore: 0,
+          description: "",
+        });
       })
       .catch((err) => {
         console.log(err);
       });
   };
-
   const { title, director, genre, metascore, description } = movie;
+
   return (
     <div className="bg-white rounded-md shadow flex-1">
       <form onSubmit={handleSubmit}>
         <div className="p-5 pb-3 border-b border-zinc-200">
-          <h4 className="text-xl font-bold">
-            Düzenleniyor <strong>{movie.title}</strong>
-          </h4>
+          <h4 className="text-xl font-bold">Detayları</h4>
         </div>
 
+        {/* İsim, Yönetmen, Tür, Metascore, Açıklama için form alanları burada eklenir */}
         <div className="px-5 py-3">
           <div className="py-2">
             <label className="block pb-1 text-lg">Title</label>
             <input
-              value={title}
+              value={title} // Bu giriş alanının value değeri state'ten gelir
               onChange={handleChange}
               name="title"
               type="text"
@@ -70,7 +59,7 @@ const EditMovieForm = (props) => {
           <div className="py-2">
             <label className="block pb-1 text-lg">Director</label>
             <input
-              value={director}
+              value={director} // Bu giriş alanının value değeri state'ten gelir
               onChange={handleChange}
               name="director"
               type="text"
@@ -79,7 +68,7 @@ const EditMovieForm = (props) => {
           <div className="py-2">
             <label className="block pb-1 text-lg">Genre</label>
             <input
-              value={genre}
+              value={genre} // Bu giriş alanının value değeri state'ten gelir
               onChange={handleChange}
               name="genre"
               type="text"
@@ -88,7 +77,7 @@ const EditMovieForm = (props) => {
           <div className="py-2">
             <label className="block pb-1 text-lg">Metascore</label>
             <input
-              value={metascore}
+              value={metascore} // Bu giriş alanının value değeri state'ten gelir
               onChange={handleChange}
               name="metascore"
               type="number"
@@ -97,7 +86,7 @@ const EditMovieForm = (props) => {
           <div className="py-2">
             <label className="block pb-1 text-lg">Description</label>
             <textarea
-              value={description}
+              value={description} // Bu giriş alanının value değeri state'ten gelir
               onChange={handleChange}
               name="description"
             ></textarea>
@@ -105,9 +94,21 @@ const EditMovieForm = (props) => {
         </div>
 
         <div className="px-5 py-4 border-t border-zinc-200 flex justify-end gap-2">
-          <Link to={`/movies/1`} className="myButton bg-zinc-500">
+          <button
+            onClick={() => {
+              // "Vazgeç" düğmesine tıklandığında formu temizleyin
+              setMovie({
+                title: "",
+                director: "",
+                genre: "",
+                metascore: 0,
+                description: "",
+              });
+            }}
+            className="myButton bg-zinc-500"
+          >
             Vazgeç
-          </Link>
+          </button>
           <button
             type="submit"
             className="myButton bg-green-700 hover:bg-green-600"
@@ -120,4 +121,4 @@ const EditMovieForm = (props) => {
   );
 };
 
-export default EditMovieForm;
+export default AddMovieForm;

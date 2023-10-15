@@ -22,6 +22,18 @@ const Movie = (props) => {
       });
   }, [id]);
 
+  const handleDelete = () => {
+    axios
+      .delete(`http://localhost:9000/api/movies/${movie.id}`)
+      .then(() => {
+        // Silme işlemi başarılıysa kullanıcıyı /movies route'una yönlendirin
+        push("/movies");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
     <div className="bg-white rounded-md shadow flex-1">
       <div className="p-5 pb-3 border-b border-zinc-200">
@@ -60,7 +72,10 @@ const Movie = (props) => {
         >
           Edit
         </Link>
-        <button type="button" className="myButton bg-red-600 hover:bg-red-500">
+        <button
+          onClick={handleDelete}
+          className="myButton bg-red-600 hover:bg-red-500"
+        >
           Sil
         </button>
       </div>
